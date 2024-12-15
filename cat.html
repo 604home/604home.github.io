@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>小猫钓鱼游戏</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #gameArea {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            margin: 20px auto;
+            border: 2px solid #000;
+            overflow: hidden;
+            background-color: #a9f5f2;
+        }
+        .fish {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-image: url('https://example.com/fish.png'); /* 替换为实际的鱼图片URL */
+            background-size: cover;
+        }
+        .cat {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            background-image: url('https://example.com/cat.png'); /* 替换为实际的小猫图片URL */
+            background-size: cover;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body>
+    <h1>小猫钓鱼游戏</h1>
+    <div id="gameArea">
+        <div class="cat"></div>
+    </div>
+    <p>得分: <span id="score">0</span></p>
+
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const cat = document.querySelector('.cat');
+        const scoreDisplay = document.getElementById('score');
+        let score = 0;
+
+        function createFish() {
+            const fish = document.createElement('div');
+            fish.classList.add('fish');
+            fish.style.left = Math.random() * (gameArea.offsetWidth - 50) + 'px';
+            fish.style.top = '-50px';
+            gameArea.appendChild(fish);
+
+            let fishPosition = parseInt(window.getComputedStyle(fish).getPropertyValue('top'));
+
+            function moveFish() {
+                if (fishPosition >= gameArea.offsetHeight) {
+                    gameArea.removeChild(fish);
+                } else {
+                    fishPosition += 2; // 调整鱼的速度
+                    fish.style.top = fishPosition + 'px';
+
+                    // 检查小猫是否钓到了鱼
+                    if (
+                        fishPosition >= gameArea.offsetHeight - 100 &&
+                        parseInt(window.getComputedStyle(fish).getPropertyValue('left')) >= cat.offsetLeft - 25 &&
+                        parseInt(window.getComputedStyle(fish).getPropertyValue('left')) <= cat.offsetLeft + 75
+                    ) {
+                        score++;
+                        scoreDisplay.textContent = score;
+                        gameArea.removeChild(fish);
+                    }
+
+                    requestAnimationFrame(moveFish);
+                }
+            }
+
+            moveFish();
+        }
+
+        setInterval(createFish, 2000); // 调整鱼出现的频率
+
+        // 控制小猫左右移动
+        document.addEventListener('keydown', function(event) {
+            const catPosition = parseInt(window.getComputedStyle(cat).getPropertyValue('left'));
+
+            if (event.key === 'ArrowLeft' && catPosition > 0) {
+                cat.style.left = catPosition - 10 + 'px'; // 调整小猫移动速度
+            } else if (event.key === 'ArrowRight' && catPosition < gameArea.offsetWidth - 100) {
+                cat.style.left = catPosition + 10 + 'px'; // 调整小猫移动速度
+            }
+        });
+    </script>
+</body>
+</html>
